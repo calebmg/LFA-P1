@@ -1,6 +1,6 @@
 ﻿namespace Proyecto_LFA
 {
-    partial class Form1
+    partial class InitialForm
     {
         /// <summary>
         /// Variable del diseñador necesaria.
@@ -28,9 +28,12 @@
         /// </summary>
         private void InitializeComponent()
         {
+            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(InitialForm));
             this.lblInstruction1 = new System.Windows.Forms.Label();
-            this.txtFilePath = new System.Windows.Forms.TextBox();
             this.btnLoadFile = new System.Windows.Forms.Button();
+            this.btnAnalyze = new System.Windows.Forms.Button();
+            this.lblFilePath = new System.Windows.Forms.Label();
+            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // lblInstruction1
@@ -43,13 +46,6 @@
             this.lblInstruction1.Text = "Ingrese el archivo que desea analizar";
             this.lblInstruction1.Click += new System.EventHandler(this.label1_Click);
             // 
-            // txtFilePath
-            // 
-            this.txtFilePath.Location = new System.Drawing.Point(64, 68);
-            this.txtFilePath.Name = "txtFilePath";
-            this.txtFilePath.Size = new System.Drawing.Size(180, 20);
-            this.txtFilePath.TabIndex = 1;
-            // 
             // btnLoadFile
             // 
             this.btnLoadFile.Location = new System.Drawing.Point(64, 94);
@@ -58,16 +54,42 @@
             this.btnLoadFile.TabIndex = 2;
             this.btnLoadFile.Text = "Cargar";
             this.btnLoadFile.UseVisualStyleBackColor = true;
+            this.btnLoadFile.Click += new System.EventHandler(this.btnLoadFile_Click);
             // 
-            // Form1
+            // btnAnalyze
+            // 
+            this.btnAnalyze.Location = new System.Drawing.Point(268, 94);
+            this.btnAnalyze.Name = "btnAnalyze";
+            this.btnAnalyze.Size = new System.Drawing.Size(75, 23);
+            this.btnAnalyze.TabIndex = 3;
+            this.btnAnalyze.Text = "Analizar";
+            this.btnAnalyze.UseVisualStyleBackColor = true;
+            // 
+            // lblFilePath
+            // 
+            this.lblFilePath.AutoSize = true;
+            this.lblFilePath.Location = new System.Drawing.Point(61, 75);
+            this.lblFilePath.Name = "lblFilePath";
+            this.lblFilePath.Size = new System.Drawing.Size(10, 13);
+            this.lblFilePath.TabIndex = 4;
+            this.lblFilePath.Text = "-";
+            // 
+            // openFileDialog
+            // 
+            this.openFileDialog.FileName = "openFileDialog1";
+            this.openFileDialog.Filter = "Archivos TXT (*.txt)|*.txt";
+            // 
+            // InitialForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(800, 450);
+            this.ClientSize = new System.Drawing.Size(420, 181);
+            this.Controls.Add(this.lblFilePath);
+            this.Controls.Add(this.btnAnalyze);
             this.Controls.Add(this.btnLoadFile);
-            this.Controls.Add(this.txtFilePath);
             this.Controls.Add(this.lblInstruction1);
-            this.Name = "Form1";
+            this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
+            this.Name = "InitialForm";
             this.Text = "Go 0.0.1";
             this.ResumeLayout(false);
             this.PerformLayout();
@@ -77,8 +99,10 @@
         #endregion
 
         private System.Windows.Forms.Label lblInstruction1;
-        private System.Windows.Forms.TextBox txtFilePath;
         private System.Windows.Forms.Button btnLoadFile;
+        private System.Windows.Forms.Button btnAnalyze;
+        private System.Windows.Forms.Label lblFilePath;
+        private System.Windows.Forms.OpenFileDialog openFileDialog;
     }
 }
 
