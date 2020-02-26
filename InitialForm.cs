@@ -18,6 +18,13 @@ namespace Proyecto_LFA
             InitializeComponent();
         }
 
+        public string regularPhrase = "(∙)";
+
+        public void MoiAlgorithm()
+        {
+
+        }
+
         private void label1_Click(object sender, EventArgs e)
         {
 
@@ -25,11 +32,34 @@ namespace Proyecto_LFA
 
         private void btnLoadFile_Click(object sender, EventArgs e)
         {
-            if(openFileDialog.ShowDialog() == DialogResult.OK)
+            var RutaLectura = "";
+            var TBuffer = 1000;
+            var texto = "";
+            if(ArchivoPrueba.ShowDialog() == DialogResult.OK)
             {
+                RutaLectura = ArchivoPrueba.FileName;
+                using (var stream = new FileStream(RutaLectura, FileMode.Open))
+                {
+                    using (var Lector = new StreamReader(stream))
+                    {
+                        var BytesBuffer = new byte[TBuffer];
+                        while (!Lector.EndOfStream)
+                        {
+                            texto = Lector.ReadToEnd();
+                        }
+                    }
+                }
+
                 //MoiAlgoithm
-                lblFilePath.Text = openFileDialog.FileName;
+
+
+                lblFilePath.Text = ArchivoPrueba.FileName;
             }
+
+        }
+
+        private void openFileDialog_FileOk(object sender, CancelEventArgs e)
+        {
 
         }
     }

@@ -33,7 +33,7 @@
             this.btnLoadFile = new System.Windows.Forms.Button();
             this.btnAnalyze = new System.Windows.Forms.Button();
             this.lblFilePath = new System.Windows.Forms.Label();
-            this.openFileDialog = new System.Windows.Forms.OpenFileDialog();
+            this.ArchivoPrueba = new System.Windows.Forms.OpenFileDialog();
             this.SuspendLayout();
             // 
             // lblInstruction1
@@ -74,10 +74,11 @@
             this.lblFilePath.TabIndex = 4;
             this.lblFilePath.Text = "-";
             // 
-            // openFileDialog
+            // ArchivoPrueba
             // 
-            this.openFileDialog.FileName = "openFileDialog1";
-            this.openFileDialog.Filter = "Archivos TXT (*.txt)|*.txt";
+            this.ArchivoPrueba.FileName = "openFileDialog1";
+            this.ArchivoPrueba.Filter = "Archivos TXT (*.txt)|*.txt";
+            this.ArchivoPrueba.FileOk += new System.ComponentModel.CancelEventHandler(this.openFileDialog_FileOk);
             // 
             // InitialForm
             // 
@@ -102,7 +103,7 @@
         private System.Windows.Forms.Button btnLoadFile;
         private System.Windows.Forms.Button btnAnalyze;
         private System.Windows.Forms.Label lblFilePath;
-        private System.Windows.Forms.OpenFileDialog openFileDialog;
+        private System.Windows.Forms.OpenFileDialog ArchivoPrueba;
     }
 }
 
