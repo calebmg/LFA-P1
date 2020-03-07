@@ -18,14 +18,13 @@ namespace Proyecto_LFA
             InitializeComponent();
         }
 
-        //EXPRESIONES REGULARES
         public static string regExSETS = "( *.L+. *.=. *.(('.S.')|(C.H.R.\\(.N+.\\))).(((\\..\\.)|\\+).(('.S.')|(C.H.R.\\(.N+.\\))). *)*)";
-        public static string regExTOKENS = "(*.T.O.K.E.N.Z *.N +.Z *.=.Z *.((('.S.') | L +). *) +)";
-        public static string regExACTIONS = "(*.N +. *.=. *.'.L+.')";
+        public static string regExTOKENS = "( *.T.O.K.E.N.Z*.N+.Z*.=.Z*.((('.S.')|L+). *)+)";
+        public static string regExACTIONS = "( *.N+. *.=. *.'.L+.')";
         public static string regExERROR = "( *.E.R.R.O.R. *.=. *.N+)";
 
-        //LISTAS PARA ALMACENAR LOS SIMBOLOS TERMINALES Y OPERADORES
-        public static List<char> operadores = new List<char>();
+
+        public static List<char> oper = new List<char>();
         public static List<char> stSETS = new List<char>();
         public static List<char> stTOKENS = new List<char>();
         public static List<char> stACTIONS = new List<char>();
@@ -57,30 +56,32 @@ namespace Proyecto_LFA
             {
                 if (Implementation.EmptyFile(lblFilePath.Text) != false)
                 {
-                    RegEx.FillInOP(operadores);
+                    RegEx.FillInOP(oper);
 
-                    RegEx.GenerateST(operadores, stSETS, regExSETS);
-                    RegEx.GenerateST(operadores, stTOKENS, regExTOKENS);
-                    RegEx.GenerateST(operadores, stACTIONS, regExACTIONS);
-                    RegEx.GenerateST(operadores, stERROR, regExERROR);
+                    RegEx.GenerateST(oper, stSETS, regExSETS);
+                    RegEx.GenerateST(oper, stTOKENS, regExTOKENS);
+                    RegEx.GenerateST(oper, stACTIONS, regExACTIONS);
+                    RegEx.GenerateST(oper, stERROR, regExERROR);
 
-                    ExpressionTree.FillInDictionaryHierarchy(operadores);
 
-                    var treeSETS = ExpressionTree.CreateTree(stSETS, operadores, regExSETS);
-                    var treeTOKENS = ExpressionTree.CreateTree(stTOKENS, operadores, regExTOKENS);
-                    var treeACTIONS = ExpressionTree.CreateTree(stACTIONS, operadores, regExACTIONS);
-                    var treeERROR = ExpressionTree.CreateTree(stERROR, operadores, regExERROR);
+                    ExpressionTree.FillInDictionaryHierarchy(oper);
+
+
+                    var treeSETS = ExpressionTree.GenerateTree(stSETS, oper, regExSETS);
+                    var treeTOKENS = ExpressionTree.GenerateTree(stTOKENS, oper, regExTOKENS);
+                    var treeACTIONS = ExpressionTree.GenerateTree(stACTIONS, oper, regExACTIONS);
+                    var treeERROR = ExpressionTree.GenerateTree(stERROR, oper, regExERROR);
 
                     Implementation.ReadFile(lblFilePath.Text, treeSETS, treeTOKENS, treeACTIONS, treeERROR);
                 }
                 else
                 {
-                    MessageBox.Show("Archivo vacío.");
+                    MessageBox.Show("Archivo Vacio");
                 }
             }
             else
             {
-                MessageBox.Show("Seleccione un archivo.");
+                MessageBox.Show("Por favor, primero seleccione un archivo");
             }
         }
     }

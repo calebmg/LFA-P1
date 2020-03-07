@@ -13,6 +13,7 @@ namespace Proyecto_LFA
         public Node leftNode { get; set; }
         public Node father { get; set; }
         public bool route { get; set; }
+
         public char info { get; set; }
 
         public Node(char value)

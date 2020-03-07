@@ -8,19 +8,19 @@ using System.Windows.Forms;
 
 namespace Proyecto_LFA
 {
-    public class MessageError
+    public class ErrorMessage
     {
-        public static string messageError;
-        public static bool errorExistente;
+        public static string errorMessage;
+        public static bool findError;
     }
     public class Implementation
     {
-        public static char[] reservedWordSet = { 'S', 'E', 'T', 'S'};
-        public static char[] reservedWordToken = { 'T', 'O', 'K', 'E', 'N', 'S' };
-        public static char[] reservedWordActions = { 'A', 'C', 'T', 'I', 'O', 'N', 'S' };
-        public static char[] reservedWordReservadas = { 'R', 'E', 'S', 'E', 'R', 'V', 'A', 'D', 'A', 'S', '(', ')' };
+        public static char[] reservedWordSETS = { 'S', 'E', 'T', 'S' };
+        public static char[] reservedWordTOKENS = { 'T', 'O', 'K', 'E', 'N', 'S' };
+        public static char[] reservedWordACTIONS = { 'A', 'C', 'T', 'I', 'O', 'N', 'S' };
+        public static char[] reservedWordRESERVADAS = { 'R', 'E', 'S', 'E', 'R', 'V', 'A', 'D', 'A', 'S', '(', ')' };
         public static List<string> text = new List<string>();
-        public static List<string> correctText = new List<string>();
+        public static List<string> originalList = new List<string>();
 
         public static bool EmptyFile(string path)
         {
@@ -52,20 +52,20 @@ namespace Proyecto_LFA
             return false;
         }
 
-        public static void ReadFile(string path, Node treeSETS, Node treeTOKENS, Node treeACTIONS, Node treeERROR)
+        public static void ReadFile(string filePath, Node treeSETS, Node treeTOKENS, Node treeACTIONS, Node treeERROR)
         {
-            var line = "";
+            var line = string.Empty;
             var columnError = 0;
             var firstChar = new char();
 
-            using(StreamReader reader = new StreamReader(path))
+            using (StreamReader reader = new StreamReader(filePath))
             {
                 while ((line = reader.ReadLine()) != null)
                 {
-                    correctText.Add(line);
+                    originalList.Add(line);
                     if (string.IsNullOrEmpty(line) == false)
                     {
-                        if ((OnlySpaces(line) == false) && (OnlyTabs(line) == false))
+                        if (OnlySpaces(line) == false && OnlyTabs(line) == false)
                         {
                             text.Add(line.Trim('\t'));
                         }
@@ -75,39 +75,37 @@ namespace Proyecto_LFA
             }
 
             var firstLine = text[0].Trim(' ').ToCharArray();
-
             switch (firstLine[0])
             {
                 case 'S':
-                    if (analyzeReserved(reservedWordSet, firstLine, 0, ref columnError, 1) != true)
+                    if (AnalyzeReservedWord(reservedWordSETS, firstLine, 0, ref columnError, 1) != true)
                     {
-                        ShowError(MessageError.messageError);
-                        MessageError.errorExistente = true;
+                        ShowError(ErrorMessage.errorMessage);
+                        ErrorMessage.findError = true;
                     }
                     firstChar = 'S';
                     break;
                 case 'T':
-                    if (analyzeReserved(reservedWordToken, firstLine, 0, ref columnError, 1) != true)
+                    if (AnalyzeReservedWord(reservedWordTOKENS, firstLine, 0, ref columnError, 1) != true)
                     {
-                        ShowError(MessageError.messageError);
-                        MessageError.errorExistente = true;
+                        ShowError(ErrorMessage.errorMessage);
+                        ErrorMessage.findError = true;
                     }
                     firstChar = 'T';
                     break;
                 default:
-                    MessageError.messageError = $"Error al inicio del arhivo: SE ESPERABA DEFINICIO´N DE TOKENS.";
-                    ShowError(MessageError.messageError);
-                    MessageError.errorExistente = true;
+                    ErrorMessage.errorMessage = $"Error al inicio del archivo: SE ESPERABA DEFINICIÓN DE TOKENS.";
+                    ShowError(ErrorMessage.errorMessage);
+                    ErrorMessage.findError = true;
                     break;
             }
-
             var i = 1;
-            if (MessageError.errorExistente == false)
+            if (ErrorMessage.findError == false)
             {
                 var grammarStart = i;
                 if (firstChar == 'S')
                 {
-                    while (text[i].Contains("TOKENS") == false && MessageError.errorExistente == false)
+                    while (text[i].Contains("TOKENS") == false && ErrorMessage.findError == false)
                     {
                         var prueba = text[i].Contains("TOKENS");
                         var filtro = text[i].ToCharArray();
@@ -119,28 +117,28 @@ namespace Proyecto_LFA
                         }
                         else
                         {
-                            MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: DEFINICION INCOMPLETA O NO TERMINO CORRECTAMENTE LA EXPRESION";
-                            MessageError.errorExistente = true;
-                            ShowError(MessageError.messageError);
+                            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: DEFINICION INCOMPLETA.";
+                            ErrorMessage.findError = true;
+                            ShowError(ErrorMessage.errorMessage);
                         }
                     }
-                    if (i - grammarStart == 0 && MessageError.errorExistente == false)
+                    if (i - grammarStart == 0 && ErrorMessage.findError == false)
                     {
-                        MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA LA DEFINICIÓN DE ALGUN SET";
-                        MessageError.errorExistente = true;
-                        ShowError(MessageError.messageError);
+                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA DEFINICIÓN DE SETS.";
+                        ErrorMessage.findError = true;
+                        ShowError(ErrorMessage.errorMessage);
                     }
                     grammarStart = i;
                 }
                 var LineaTokensLeida = false;
-                while (text[i].Contains("ACTIONS") == false && MessageError.errorExistente == false)
+                while (text[i].Contains("ACTIONS") == false && ErrorMessage.findError == false)
                 {
                     if (LineaTokensLeida == false && firstChar == 'S')
                     {
-                        if (analyzeReserved(reservedWordToken, text[i].ToCharArray(), 0, ref columnError, 1) != true)
+                        if (AnalyzeReservedWord(reservedWordTOKENS, text[i].ToCharArray(), 0, ref columnError, 1) != true)
                         {
-                            ShowError(MessageError.messageError);
-                            MessageError.errorExistente = true;
+                            ShowError(ErrorMessage.errorMessage);
+                            ErrorMessage.findError = true;
                         }
                         LineaTokensLeida = true;
                         i++;
@@ -163,38 +161,38 @@ namespace Proyecto_LFA
                         {
                             if (text[i].Contains('(') && !text[i].Contains(')'))
                             {
-                                MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA UN ) EN TOKEN.";
-                                MessageError.errorExistente = true;
-                                ShowError(MessageError.messageError);
+                                ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA ) EN TOKEN.";
+                                ErrorMessage.findError = true;
+                                ShowError(ErrorMessage.errorMessage);
                             }
                             else
                             {
-                                MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: DEFINICION INCOMPLETA.";
-                                MessageError.errorExistente = true;
-                                ShowError(MessageError.messageError);
+                                ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: DEFINICION INCOMPLETA.";
+                                ErrorMessage.findError = true;
+                                ShowError(ErrorMessage.errorMessage);
                             }
                         }
                     }
                 }
-                if (i - grammarStart == 0 && MessageError.errorExistente == false)
+                if (i - grammarStart == 0 && ErrorMessage.findError == false)
                 {
-                    MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA LA DEFINICIÓN DE UN TOKEN.";
-                    MessageError.errorExistente = true;
-                    ShowError(MessageError.messageError);
+                    ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA: SE ESPERABA LA DEFINICIÓN DE ALGUN TOKEN.";
+                    ErrorMessage.findError = true;
+                    ShowError(ErrorMessage.errorMessage);
                 }
 
-                if (analyzeReserved(reservedWordActions, text[i].ToCharArray(), 0, ref columnError, i) == true && MessageError.errorExistente == false)
+                if (AnalyzeReservedWord(reservedWordACTIONS, text[i].ToCharArray(), 0, ref columnError, i) == true && ErrorMessage.findError == false)
                 {
                     columnError = 0;
                     i++;
-                    if (analyzeReserved(reservedWordReservadas, text[i].ToCharArray(), 0, ref columnError, i) == true && MessageError.errorExistente == false)
+                    if (AnalyzeReservedWord(reservedWordRESERVADAS, text[i].ToCharArray(), 0, ref columnError, i) == true && ErrorMessage.findError == false)
                     {
                         i++;
                         if (text[i] == "{")
                         {
                             i++;
                             var contador_Actions = i;
-                            while (text[i].Contains("}") == false && i < text.Count && MessageError.errorExistente == false)
+                            while (text[i].Contains("}") == false && i < text.Count && ErrorMessage.findError == false)
                             {
                                 columnError = 0;
                                 var filtro = text[i].ToCharArray();
@@ -205,16 +203,16 @@ namespace Proyecto_LFA
                                 }
                                 else
                                 {
-                                    MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: DEFINICIÓN INCOMPLETA.";
-                                    MessageError.errorExistente = true;
-                                    ShowError(MessageError.messageError);
+                                    ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: DEFINICION INCOMPLETA.";
+                                    ErrorMessage.findError = true;
+                                    ShowError(ErrorMessage.errorMessage);
                                 }
                             }
-                            if (i - contador_Actions == 0 || i == text.Count && MessageError.errorExistente == false)
+                            if (i - contador_Actions == 0 || i == text.Count && ErrorMessage.findError == false)
                             {
-                                MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA " + "}.";
-                                MessageError.errorExistente = true;
-                                ShowError(MessageError.messageError);
+                                ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA " + "}.";
+                                ErrorMessage.findError = true;
+                                ShowError(ErrorMessage.errorMessage);
                             }
                             if (text[i] == "}" && i < text.Count)
                             {
@@ -222,26 +220,26 @@ namespace Proyecto_LFA
                             }
                             else
                             {
-                                MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA " + "}" + " DE LA FUNCIÓN.";
-                                MessageError.errorExistente = true;
-                                ShowError(MessageError.messageError);
+                                ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA " + "}" + "DE LA FUNCIÓN.";
+                                ErrorMessage.findError = true;
+                                ShowError(ErrorMessage.errorMessage);
                             }
                         }
                     }
                     else
                     {
-                        MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA PALABRA RESERVADA ACOMPAÑADO DE ACTIONS.";
-                        MessageError.errorExistente = true;
-                        ShowError(MessageError.messageError);
+                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA PALABRA RESERVADA CON ACTIONS.";
+                        ErrorMessage.findError = true;
+                        ShowError(ErrorMessage.errorMessage);
                     }
                 }
                 else
                 {
-                    MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA ACTIONS.";
-                    MessageError.errorExistente = true;
-                    ShowError(MessageError.messageError);
+                    ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA ACTIONS.";
+                    ErrorMessage.findError = true;
+                    ShowError(ErrorMessage.errorMessage);
                 }
-                while (text[i].Contains("ERROR") == false && i < text.Count && MessageError.errorExistente == false)
+                while (text[i].Contains("ERROR") == false && i < text.Count && ErrorMessage.findError == false)
                 {
                     if (text[i].Contains('(') && text[i].Contains(')'))
                     {
@@ -250,7 +248,7 @@ namespace Proyecto_LFA
                         {
                             i++;
                             var contador_Actions = i;
-                            while (text[i].Contains("}") == false && i < text.Count && MessageError.errorExistente == false)
+                            while (text[i].Contains("}") == false && i < text.Count && ErrorMessage.findError == false)
                             {
                                 columnError = 0;
                                 var filtro = text[i].ToCharArray();
@@ -261,17 +259,16 @@ namespace Proyecto_LFA
                                 }
                                 else
                                 {
-                                    MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: DEFINICIÓN INCOMPLETA.";
-                                    MessageError.errorExistente = true;
-                                    ShowError(MessageError.messageError);
-
+                                    ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: DEFINICION INCOMPLETA.";
+                                    ErrorMessage.findError = true;
+                                    ShowError(ErrorMessage.errorMessage);
                                 }
                             }
-                            if (i - contador_Actions == 0 || i == text.Count && MessageError.errorExistente == false)
+                            if (i - contador_Actions == 0 || i == text.Count && ErrorMessage.findError == false)
                             {
-                                MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA SE ESPERABA " + "}.";
-                                MessageError.errorExistente = true;
-                                ShowError(MessageError.messageError);
+                                ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA " + "}" + " AL FINAL.";
+                                ErrorMessage.findError = true;
+                                ShowError(ErrorMessage.errorMessage);
                             }
                             if (text[i] == "}" && i < text.Count)
                             {
@@ -279,28 +276,28 @@ namespace Proyecto_LFA
                             }
                             else
                             {
-                                MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA " + "}" + "DE LA FUNCIÓN.";
-                                MessageError.errorExistente = true;
-                                ShowError(MessageError.messageError);
+                                ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA " + "}" + " AL FINAL DE LA FUNCIÓN.";
+                                ErrorMessage.findError = true;
+                                ShowError(ErrorMessage.errorMessage);
                             }
                         }
                         else
                         {
-                            MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA " + "{" + " DE LA FUNCIÓN.";
-                            MessageError.errorExistente = true;
-                            ShowError(MessageError.messageError);
+                            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA " + "{" + " AL INCIO DE LA FUNCIÓN.";
+                            ErrorMessage.findError = true;
+                            ShowError(ErrorMessage.errorMessage);
                         }
                     }
                     else
                     {
-                        MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA LA DEFINICIÓN DE UNA FUNCIÓN.";
-                        MessageError.errorExistente = true;
-                        ShowError(MessageError.messageError);
+                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA DEFINICIÓN DE UNA FUNCIÓN.";
+                        ErrorMessage.findError = true;
+                        ShowError(ErrorMessage.errorMessage);
                     }
                 }
                 if (i < text.Count)
                 {
-                    while (i < text.Count && MessageError.errorExistente == false)
+                    while (i < text.Count && ErrorMessage.findError == false)
                     {
                         var filtro = text[i].ToCharArray();
                         if (char.IsNumber(filtro[filtro.Length - 1]))
@@ -311,37 +308,36 @@ namespace Proyecto_LFA
                         }
                         else
                         {
-                            MessageError.messageError = $"Error en la línea {ReturnErrorLine(text[i])}: SE ESPERABA ALGUN NÚMERO EN ERRORES.";
-                            MessageError.errorExistente = true;
-                            ShowError(MessageError.messageError);
+                            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[i])}: SE ESPERABA NÚMEROS, EN ERRORES.";
+                            ErrorMessage.findError = true;
+                            ShowError(ErrorMessage.errorMessage);
                         }
                     }
                 }
-                if (MessageError.errorExistente == false && i == text.Count)
-                {
-                    CorrectFile();
-                }
+            }
+            if (ErrorMessage.findError == false && i == text.Count)
+            {
+                CorrectoFile();
             }
         }
-
-        public static bool analyzeReserved(char[] reserverd, char[] line, int cont, ref int columnError, int lineError)
+        public static bool AnalyzeReservedWord(char[] reserved, char[] line, int cont, ref int columnError, int lineError)
         {
-            if (cont < reserverd.Length)
+            if (cont < reserved.Length)
             {
                 columnError++;
                 if (cont < line.Length)
                 {
-                    if (line[cont] == reserverd[cont])
+                    if (line[cont] == reserved[cont])
                     {
-                        return analyzeReserved(reserverd, line, cont + 1, ref columnError, lineError);
+                        return AnalyzeReservedWord(reserved, line, cont + 1, ref columnError, lineError);
                     }
                 }
             }
-            if (cont == reserverd.Length)
+            if (cont == reserved.Length)
             {
                 return true;
             }
-            MessageError.messageError = $"Error en línea {lineError}, columna {columnError}: FALTA {reserverd[cont]}.";
+            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(text[lineError])}: SE ESPERABA {reserved[cont]}.";
             return false;
         }
 
@@ -350,7 +346,7 @@ namespace Proyecto_LFA
         static List<string> ids = new List<string>();
         public static void CompareTree(Node tree, string line, ref int column, List<char> st, int lineError)
         {
-            if (tree != null && MessageError.errorExistente == false)
+            if (tree != null && ErrorMessage.findError == false)
             {
                 CompareTree(tree.leftNode, line, ref column, st, lineError);
                 if (tree.info == '|' && NodeRoute(tree.leftNode) == true)
@@ -364,11 +360,11 @@ namespace Proyecto_LFA
                 }
                 else if (tree.info == '|' && NodeRoute(tree.leftNode) == false && NodeRoute(tree.rightNode) == false)
                 {
-                    MessageError.messageError = $"Error en la línea {ReturnErrorLine(line)}: FALTA IDENTIFICADOR.";
-                    MessageError.errorExistente = true;
-                    ShowError(MessageError.messageError);
+                    ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA UN IDENTIFICADOR.";
+                    ErrorMessage.findError = true;
+                    ShowError(ErrorMessage.errorMessage);
                 }
-                if (MessageError.errorExistente == false && flagLeftOR == false && flagRightOR == false && column < line.Length)
+                if (ErrorMessage.findError == false && flagLeftOR == false && flagRightOR == false && column < line.Length)
                 {
                     if (st.Contains(tree.info) && IsLeaf(tree) != false)
                     {
@@ -405,7 +401,7 @@ namespace Proyecto_LFA
                                 case 'L':
                                     if (flagLeftOR == false)
                                     {
-                                        while ((char.IsUpper(line[column]) || line[column] == '*' || line[column] == '|' || line[column] == '(' || line[column] == '{' || line[column] == ')' || line[column] == '}') && MessageError.errorExistente == false)
+                                        while ((char.IsUpper(line[column]) || line[column] == '*' || line[column] == '|' || line[column] == '(' || line[column] == '{' || line[column] == ')' || line[column] == '}') && ErrorMessage.findError == false)
                                         {
                                             switch (line[column])
                                             {
@@ -432,32 +428,32 @@ namespace Proyecto_LFA
                                                         }
                                                         if (contador_S == 0)
                                                         {
-                                                            MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: FALTA EXPRESIÓN LUEGO DE |.";
-                                                            MessageError.errorExistente = true;
-                                                            ShowError(MessageError.messageError);
+                                                            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA EXPRESIÓN LUEGO DE |.";
+                                                            ErrorMessage.findError = true;
+                                                            ShowError(ErrorMessage.errorMessage);
                                                         }
                                                     }
                                                     else
                                                     {
-                                                        MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: FALTA EXPRESIÓN LUEGO DE |.";
-                                                        MessageError.errorExistente = true;
-                                                        ShowError(MessageError.messageError);
+                                                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA EXPRESIÓN LUEGO DE |.";
+                                                        ErrorMessage.findError = true;
+                                                        ShowError(ErrorMessage.errorMessage);
                                                     }
                                                     break;
                                                 case '(':
                                                     if (line.Contains(')') == false)
                                                     {
-                                                        MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: FALTA CERRAR PARENTESIS.";
-                                                        MessageError.errorExistente = true;
-                                                        ShowError(MessageError.messageError);
+                                                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA ) AL FINAL DE LA EXPRESIÓN.";
+                                                        ErrorMessage.findError = true;
+                                                        ShowError(ErrorMessage.errorMessage);
                                                     }
                                                     break;
                                                 case '{':
                                                     if (line.Contains('}') == false)
                                                     {
-                                                        MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: FALTA CERRAR LLAVES.";
-                                                        MessageError.errorExistente = true;
-                                                        ShowError(MessageError.messageError);
+                                                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA " + "}" + " AL FINAL DE LA EXPRESIÓN.";
+                                                        ErrorMessage.findError = true;
+                                                        ShowError(ErrorMessage.errorMessage);
                                                     }
                                                     break;
                                             }
@@ -469,9 +465,9 @@ namespace Proyecto_LFA
                                         }
                                         if (column - verificador == 0)
                                         {
-                                            MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: SE ESPERABA UN IDENTIFICADOR.";
-                                            MessageError.errorExistente = true;
-                                            ShowError(MessageError.messageError);
+                                            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA UN IDENTIFICADOR.";
+                                            ErrorMessage.findError = true;
+                                            ShowError(ErrorMessage.errorMessage);
                                         }
                                     }
                                     break;
@@ -488,9 +484,9 @@ namespace Proyecto_LFA
                                     }
                                     if (column - verificador == 0)
                                     {
-                                        MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: SE ESPERABA UN NÚMERO";
-                                        MessageError.errorExistente = true;
-                                        ShowError(MessageError.messageError);
+                                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA UN NÚMERO.";
+                                        ErrorMessage.findError = true;
+                                        ShowError(ErrorMessage.errorMessage);
                                     }
                                     break;
                                 case ' ':
@@ -504,21 +500,21 @@ namespace Proyecto_LFA
                                     }
                                     if (column - verificador == 0)
                                     {
-                                        MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: SE ESPERABAN ESPACIOS.";
-                                        MessageError.errorExistente = true;
-                                        ShowError(MessageError.messageError);
+                                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: NO VENIA ESPACIOS.";
+                                        ErrorMessage.findError = true;
+                                        ShowError(ErrorMessage.errorMessage);
                                     }
                                     break;
                                 case 'S':
                                     var parentesis_A = false;
                                     var parentesis_C = false;
-                                    while (line[column] >= 32 && line[column] < 255 && MessageError.errorExistente == false)
+                                    while (line[column] >= 32 && line[column] < 255 && ErrorMessage.findError == false)
                                     {
                                         if (char.IsLetter(line[column]) == true && char.IsUpper(line[column]) == false)
                                         {
-                                            MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: SE ESPERABA MAYUSCULA.";
-                                            MessageError.errorExistente = true;
-                                            ShowError(MessageError.messageError);
+                                            ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABAN MAYUSCULAS.";
+                                            ErrorMessage.findError = true;
+                                            ShowError(ErrorMessage.errorMessage);
                                         }
                                         column++;
                                         if (column == line.Length)
@@ -536,9 +532,9 @@ namespace Proyecto_LFA
                                     }
                                     if (column - verificador == 0 && flagLeftOR == false && flagRightOR == false)
                                     {
-                                        MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: SE ESPERABA UN TERMINAL O SIMBOLO.";
-                                        MessageError.errorExistente = true;
-                                        ShowError(MessageError.messageError);
+                                        ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA UN SIMBOLO O TERMINAL.";
+                                        ErrorMessage.findError = true;
+                                        ShowError(ErrorMessage.errorMessage);
                                     }
                                     break;
                             }
@@ -563,16 +559,15 @@ namespace Proyecto_LFA
                                 {
                                     column++;
                                 }
-
                                 else if (line[column] != tree.info && CheckFather(tree, '|') == true)
                                 {
                                     flagRightOR = true;
                                 }
                                 else
                                 {
-                                    MessageError.messageError = $"Error en línea {ReturnErrorLine(line)}: SE ESPERABA UN {tree.info}.";
-                                    MessageError.errorExistente = true;
-                                    ShowError(MessageError.messageError);
+                                    ErrorMessage.errorMessage = $"Error en línea #{ReturnErrorLine(line)}: SE ESPERABA UN {tree.info}";
+                                    ErrorMessage.findError = true;
+                                    ShowError(ErrorMessage.errorMessage);
                                 }
                             }
                         }
@@ -586,7 +581,7 @@ namespace Proyecto_LFA
                     }
                     if ((tree.info == '*' || tree.info == '+') && tree.father.father == null && column < line.Length)
                     {
-                        TurnOffTour(tree);
+                        TurnOffRoute(tree);
                         CompareTree(tree, line, ref column, st, lineError);
                     }
                     tree.route = true;
@@ -594,8 +589,8 @@ namespace Proyecto_LFA
                 CompareTree(tree.rightNode, line, ref column, st, lineError);
                 if (tree.info == '|' && (NodeRoute(tree.leftNode) == true || NodeRoute(tree.rightNode) == true))
                 {
-                    flagLeftOR = false;
                     flagRightOR = false;
+                    flagLeftOR = false;
 
                 }
             }
@@ -603,7 +598,7 @@ namespace Proyecto_LFA
 
         public static bool IsLeaf(Node node)
         {
-            if (node.rightNode == null && node. leftNode == null)
+            if (node.rightNode == null && node.leftNode == null)
             {
                 return true;
             }
@@ -624,7 +619,7 @@ namespace Proyecto_LFA
             return flagFather;
         }
 
-        public static bool NodeRoute(Node node)  
+        public static bool NodeRoute(Node node)
         {
             if (node.route == true)
             {
@@ -633,20 +628,20 @@ namespace Proyecto_LFA
             return false;
         }
 
-        public static void TurnOffTour(Node node)
+        public static void TurnOffRoute(Node node)
         {
             if (node != null)
             {
-                TurnOffTour(node.leftNode);
+                TurnOffRoute(node.leftNode);
                 node.route = false;
-                TurnOffTour(node.rightNode);
+                TurnOffRoute(node.rightNode);
             }
         }
 
         public static int ReturnErrorLine(string line)
         {
             var cont = 1;
-            foreach (var item in correctText)
+            foreach (var item in originalList)
             {
                 if (line == item)
                 {
@@ -657,14 +652,13 @@ namespace Proyecto_LFA
             return cont;
         }
 
-        public static void CorrectFile()
+        public static void CorrectoFile()
         {
-            MessageBox.Show("Archivo sin NINGUN error.");
+            MessageBox.Show("ARCHIVO DE PRUEBA SIN NINGUN ERROR");
         }
-
-        public static void ShowError(string text) 
+        public static void ShowError(string message)
         {
-            MessageBox.Show(text);
+            MessageBox.Show(message);
         }
     }
 }
