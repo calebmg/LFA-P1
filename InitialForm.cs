@@ -18,12 +18,19 @@ namespace Proyecto_LFA
             InitializeComponent();
         }
 
-        public string regularPhrase = "(∙)";
+        //EXPRESIONES REGULARES
+        public static string regExSETS = "( *.L+. *.=. *.(('.S.')|(C.H.R.\\(.N+.\\))).(((\\..\\.)|\\+).(('.S.')|(C.H.R.\\(.N+.\\))). *)*)";
+        public static string regExTOKENS = "(*.T.O.K.E.N.Z *.N +.Z *.=.Z *.((('.S.') | L +). *) +)";
+        public static string regExACTIONS = "(*.N +. *.=. *.'.L+.')";
+        public static string regExERROR = "( *.E.R.R.O.R. *.=. *.N+)";
 
-        public void MoiAlgorithm()
-        {
+        //LISTAS PARA ALMACENAR LOS SIMBOLOS TERMINALES Y OPERADORES
+        public static List<char> operadores = new List<char>();
+        public static List<char> stSETS = new List<char>();
+        public static List<char> stTOKENS = new List<char>();
+        public static List<char> stACTIONS = new List<char>();
+        public static List<char> stERROR = new List<char>();
 
-        }
 
         private void label1_Click(object sender, EventArgs e)
         {
@@ -32,27 +39,8 @@ namespace Proyecto_LFA
 
         private void btnLoadFile_Click(object sender, EventArgs e)
         {
-            var RutaLectura = "";
-            var TBuffer = 1000;
-            var texto = "";
             if(ArchivoPrueba.ShowDialog() == DialogResult.OK)
             {
-                RutaLectura = ArchivoPrueba.FileName;
-                using (var stream = new FileStream(RutaLectura, FileMode.Open))
-                {
-                    using (var Lector = new StreamReader(stream))
-                    {
-                        var BytesBuffer = new byte[TBuffer];
-                        while (!Lector.EndOfStream)
-                        {
-                            texto = Lector.ReadToEnd();
-                        }
-                    }
-                }
-
-                //MoiAlgoithm
-
-
                 lblFilePath.Text = ArchivoPrueba.FileName;
             }
 
@@ -61,6 +49,39 @@ namespace Proyecto_LFA
         private void openFileDialog_FileOk(object sender, CancelEventArgs e)
         {
 
+        }
+
+        private void btnAnalyze_Click(object sender, EventArgs e)
+        {
+            if (lblFilePath.Text != "")
+            {
+                if (Implementation.EmptyFile(lblFilePath.Text) != false)
+                {
+                    RegEx.FillInOP(operadores);
+
+                    RegEx.GenerateST(operadores, stSETS, regExSETS);
+                    RegEx.GenerateST(operadores, stTOKENS, regExTOKENS);
+                    RegEx.GenerateST(operadores, stACTIONS, regExACTIONS);
+                    RegEx.GenerateST(operadores, stERROR, regExERROR);
+
+                    ExpressionTree.FillInDictionaryHierarchy(operadores);
+
+                    var treeSETS = ExpressionTree.CreateTree(stSETS, operadores, regExSETS);
+                    var treeTOKENS = ExpressionTree.CreateTree(stTOKENS, operadores, regExTOKENS);
+                    var treeACTIONS = ExpressionTree.CreateTree(stACTIONS, operadores, regExACTIONS);
+                    var treeERROR = ExpressionTree.CreateTree(stERROR, operadores, regExERROR);
+
+                    Implementation.ReadFile(lblFilePath.Text, treeSETS, treeTOKENS, treeACTIONS, treeERROR);
+                }
+                else
+                {
+                    MessageBox.Show("Archivo vacío.");
+                }
+            }
+            else
+            {
+                MessageBox.Show("Seleccione un archivo.");
+            }
         }
     }
 }

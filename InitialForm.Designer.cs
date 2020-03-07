@@ -64,15 +64,15 @@
             this.btnAnalyze.TabIndex = 3;
             this.btnAnalyze.Text = "Analizar";
             this.btnAnalyze.UseVisualStyleBackColor = true;
+            this.btnAnalyze.Click += new System.EventHandler(this.btnAnalyze_Click);
             // 
             // lblFilePath
             // 
             this.lblFilePath.AutoSize = true;
             this.lblFilePath.Location = new System.Drawing.Point(61, 75);
             this.lblFilePath.Name = "lblFilePath";
-            this.lblFilePath.Size = new System.Drawing.Size(10, 13);
+            this.lblFilePath.Size = new System.Drawing.Size(0, 13);
             this.lblFilePath.TabIndex = 4;
-            this.lblFilePath.Text = "-";
             // 
             // ArchivoPrueba
             // 
