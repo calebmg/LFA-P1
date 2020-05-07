@@ -38,6 +38,7 @@ namespace Proyecto_LFA
                 writer.WriteLine("          {");
                 writer.WriteLine("              Console.WriteLine(\"Ingresar cadena a escanear\");");
                 writer.WriteLine("              cadena = Console.ReadLine();");
+                writer.WriteLine("              cadena = cadena.ToLower();");
                 writer.WriteLine("              if(cadena.Length > 0)");
                 writer.WriteLine("              {");
                 writer.WriteLine("                  LlenarListaAceptados();");

@@ -217,7 +217,7 @@ namespace Proyecto_LFA
             for (int i = inicio; i < fin; i++)
             {
                 var tmp = gramatica[i].Split('=');
-                DiccionarioActions.Add(tmp[0].Trim(' '), tmp[1].Trim('\'', ' '));
+                DiccionarioActions.Add(tmp[0].Trim(' '), tmp[1].Trim('\'', ' ').ToLower());
             }
         }
         public static void LlenrListaErrores(List<string> gramatica, int inicio, int fin) 
