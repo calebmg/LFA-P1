@@ -24,7 +24,7 @@ namespace Proyecto_LFA
                 writer.WriteLine("using System.Linq;");
                 writer.WriteLine("using System.Text;");
                 writer.WriteLine("using System.Threading.Tasks;");
-                writer.WriteLine("namespace Scanner");
+                writer.WriteLine("namespace Escaner");
                 writer.WriteLine("{");
                 writer.WriteLine("      public class program");
                 writer.WriteLine("      {");
@@ -36,7 +36,7 @@ namespace Proyecto_LFA
                 writer.WriteLine("          public static Dictionary<string, string> Definicion_Tokens = new Dictionary<string, string>();");
                 writer.WriteLine("          static void Main(string[] args)");
                 writer.WriteLine("          {");
-                writer.WriteLine("              Console.WriteLine(\"INGRESAR CADENA A EVALUAR MEDIANTE SCANNER\");");
+                writer.WriteLine("              Console.WriteLine(\"Ingresar cadena a escanear\");");
                 writer.WriteLine("              cadena = Console.ReadLine();");
                 writer.WriteLine("              if(cadena.Length > 0)");
                 writer.WriteLine("              {");

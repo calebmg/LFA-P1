@@ -220,7 +220,7 @@
             this.btnGenerar.Name = "btnGenerar";
             this.btnGenerar.Size = new System.Drawing.Size(201, 33);
             this.btnGenerar.TabIndex = 16;
-            this.btnGenerar.Text = "GENERAR PROGRAMA";
+            this.btnGenerar.Text = "Generar escaner";
             this.btnGenerar.UseVisualStyleBackColor = false;
             this.btnGenerar.Click += new System.EventHandler(this.btnGenerar_Click);
             // 
@@ -248,7 +248,7 @@
             this.Font = new System.Drawing.Font("Century Gothic", 9.75F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.Margin = new System.Windows.Forms.Padding(3, 2, 3, 2);
             this.Name = "Form1";
-            this.Text = "Form1";
+            this.Text = "Generador de automata";
             this.Load += new System.EventHandler(this.Form1_Load);
             ((System.ComponentModel.ISupportInitialize)(this.dataGV_FLN)).EndInit();
             ((System.ComponentModel.ISupportInitialize)(this.dataGVFollow)).EndInit();
